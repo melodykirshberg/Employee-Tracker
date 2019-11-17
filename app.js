@@ -15,3 +15,26 @@ const db = new Database({
 });
 // =====================================
 
+// Main Questions ======================
+async function mainQuestions() {
+    return inquirer
+        .prompt([
+            {
+                type: 'list',
+                message: 'What would you like to do?',
+                name: 'action',
+                choices: [
+                    'Add department',
+                    'Add employee',
+                    'Add role',
+                    'View department',
+                    'View roles',
+                    'View employees',
+                    'Update employee role',
+                    'Exit'
+                ]
+            }
+        ])
+};
+// =====================================
+
