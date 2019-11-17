@@ -13,7 +13,7 @@ const db = mysql.createConnection({
     database: 'cms_db'
 });
 // Connects and checks for error -------
-db.connect(function (err) {
+db.connect((err) => {
     if (err) throw err;
     start();
 });
@@ -24,7 +24,7 @@ db.connect(function (err) {
 // =====================================
 
 // Start ===============================
-async function start() {
+function start() {
     inquirer
         .prompt([
             {
@@ -42,10 +42,11 @@ async function start() {
                     'Exit'
                 ]
             }
-        ]).then(function (answer) {
+        ]).then((answer) => {
             switch (answer.action) {
                 case 'Add department':
-                    addDepartment();
+                    const newDepName =
+                        addDepartment();
                     break;
                 case 'Add employee':
                     addEmployee();
@@ -70,12 +71,24 @@ async function start() {
                     break;
 
             }
+            if (err) throw (err);
         })
 };
-
-
 // =====================================
 
 // Add Department function =============
-
-// async function addDepartment(department)
+function addDepartment() {
+    inquirer
+        .prompt({
+            name: 'name',
+            type: 'input',
+            message: 'Enter name of new department'
+        }).then(({ name }) => {
+            const query = 'insert into department (name) values (?)';
+            db.query(query, name, (err, res) => {
+                if (err) throw (err);
+                start();
+            })
+        })
+}
+// =====================================
