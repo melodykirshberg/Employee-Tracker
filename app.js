@@ -163,6 +163,14 @@ function viewByDepartment() {
 // =====================================
 
 // View roles function =================
+function viewRoles() {
+    const query = 'select * from role';
+    db.query(query, (err, res) => {
+        if (err) throw (err);
+        console.table(res);
+        start();
+    });
+};
 // =====================================
 
 // View employees function =============
