@@ -174,4 +174,12 @@ function viewRoles() {
 // =====================================
 
 // View employees function =============
+function viewEmployees() {
+    const query = 'select * from employee';
+    db.query(query, (err, res) => {
+        if (err) throw (err);
+        console.table(res);
+        start();
+    });
+};
 // =====================================
