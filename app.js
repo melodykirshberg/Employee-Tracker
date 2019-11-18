@@ -19,10 +19,6 @@ db.connect((err) => {
 });
 // =====================================
 
-// Gets info from database =============
-
-// =====================================
-
 // Start ===============================
 function start() {
     inquirer
@@ -45,8 +41,7 @@ function start() {
         ]).then((answer) => {
             switch (answer.action) {
                 case 'Add department':
-                    const newDepName =
-                        addDepartment();
+                    addDepartment();
                     break;
                 case 'Add employee':
                     addEmployee();
@@ -69,14 +64,13 @@ function start() {
                 default:
                     db.end();
                     break;
-
             }
             if (err) throw (err);
         })
 };
 // =====================================
 
-// Add Department function =============
+// Add department function =============
 function addDepartment() {
     inquirer
         .prompt({
@@ -92,3 +86,39 @@ function addDepartment() {
         })
 }
 // =====================================
+
+// Add employee function ===============
+function addEmployee() {
+    inquirer
+        .prompt([{
+            name: 'first_name',
+            type: 'input',
+            message: 'Enter the new employees first name: '
+        },
+        {
+            name: 'last_name',
+            type: 'input',
+            message: 'Enter the new employees last name: '
+        },
+        {
+            name: 'role_id',
+            type: 'input',
+            message: 'Enter the new employees role: '
+        },
+        {
+            name: 'manager_id',
+            type: 'input',
+            message: 'Enter the new employees manager'
+        }
+        ]).then((res) => {
+            const query = 'insert into employee (first_name, last_name, role_id, manager_id) values (?,?,?,?)';
+            const employee = [res.first_name, res.last_name, res.role_id, res.manager_id]
+            db.query(query, employee, (err, res) => {
+                if (err) throw (err);
+                start();
+            });
+        });
+};
+// =====================================
+
+// Add role function ===============
