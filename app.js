@@ -50,7 +50,7 @@ function start() {
                     addRole();
                     break;
                 case 'View department':
-                    viewDepartment();
+                    viewAllDepartments();
                     break;
                 case 'View roles':
                     viewRoles();
@@ -121,4 +121,41 @@ function addEmployee() {
 };
 // =====================================
 
-// Add role function ===============
+// Add role function ===================
+function addRole() {
+    inquirer
+    .prompt([
+        {
+            name: 'title',
+            type: 'input',
+            message: 'Enter title of new role: '
+        },
+        {
+            name: 'salary',
+            type: 'integer',
+            message: 'Enter the salary of the new role: '
+        },
+        {
+            name: 'department_id',
+            type: 'input',
+            message: 'Enter the department ID for the new role: '
+        }
+    ]).then((res) => {
+        const query = 'insert into role (title, salary, department_id) values (?,?,?)';
+        const role = [res.title, res.salary, res.department_id];
+        db.query(query, role, (err, res) => {
+            if (err) throw (err);
+            start();
+        })
+    })
+}
+// =====================================
+
+// View department function ============
+// =====================================
+
+// View roles function =================
+// =====================================
+
+// View employees function =============
+// =====================================
