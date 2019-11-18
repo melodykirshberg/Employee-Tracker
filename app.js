@@ -1,7 +1,7 @@
 // Packages ============================
 const mysql = require('mysql')
 const inquirer = require('inquirer')
-const ct = require('console.table')
+const table = require('table')
 // =====================================
 
 // MySQL Connection ====================
