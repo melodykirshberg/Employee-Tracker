@@ -31,7 +31,7 @@ function start() {
                     'Add department',
                     'Add employee',
                     'Add role',
-                    'View department',
+                    'View by department',
                     'View roles',
                     'View employees',
                     'Update employee role',
@@ -49,8 +49,8 @@ function start() {
                 case 'Add role':
                     addRole();
                     break;
-                case 'View department':
-                    viewAllDepartments();
+                case 'View by department':
+                    viewByDepartment();
                     break;
                 case 'View roles':
                     viewRoles();
@@ -152,6 +152,14 @@ function addRole() {
 // =====================================
 
 // View department function ============
+function viewByDepartment() {
+    const query = 'select * from department';
+    db.query(query, (err, res) => {
+        if (err) throw (err);
+        console.table(res);
+        start();
+    });
+};
 // =====================================
 
 // View roles function =================
