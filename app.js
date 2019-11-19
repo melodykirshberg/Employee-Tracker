@@ -186,7 +186,6 @@ function viewByDepartment() {
     db.query(query, (err, res) => {
         if (err) throw err;
         console.log(table(toTableFormat(res)));
-        console.log(res);
         start();
     });
 };
@@ -258,8 +257,8 @@ function deleteEmployees() {
 }
 // =====================================
 
-function toTableFormat(arrayOfObjects) {
-    const header = Object.keys(arrayOfObjects[0]);
-    const rows = arrayOfObjects.map(obj => Object.values(obj));
+function toTableFormat(arr) {
+    const header = Object.keys(arr[0]);
+    const rows = arr.map(obj => Object.values(obj));
     return [header, ...rows];
 }
