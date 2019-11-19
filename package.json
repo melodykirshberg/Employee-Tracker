@@ -18,8 +18,9 @@
   },
   "homepage": "https://github.com/verlitas/Employee-Tracker#readme",
   "dependencies": {
-    "console.table": "^0.10.0",
+    "cfonts": "^2.4.5",
     "inquirer": "^7.0.0",
-    "mysql": "^2.17.1"
+    "mysql": "^2.17.1",
+    "table": "^5.4.6"
   }
 }

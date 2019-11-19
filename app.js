@@ -1,7 +1,8 @@
 // Packages ============================
 const mysql = require('mysql')
 const inquirer = require('inquirer')
-const ct = require('console.table')
+const { table } = require('table')
+const CFonts = require('cfonts');
 // =====================================
 
 // MySQL Connection ====================
@@ -16,6 +17,19 @@ const db = mysql.createConnection({
 db.connect((err) => {
     if (err) throw err;
     start();
+});
+// =====================================
+
+// ASCII ===============================
+CFonts.say('Employee Tracker', {
+    font: 'block',
+    align: 'left',
+    colors: ['blueBright', 'whiteBright'],
+    background: 'transparent',
+    letterSpacing: 1,
+    lineHeight: 1,
+    space: true,
+    maxLength: '8',
 });
 // =====================================
 
@@ -34,7 +48,11 @@ function start() {
                     'View by department',
                     'View roles',
                     'View employees',
-                    'Update employee role',
+                    'View employees by manager',
+                    'Update employee managers',
+                    'Delete departments',
+                    'Delete roles',
+                    'Delete employees',
                     'Exit'
                 ]
             }
@@ -58,14 +76,25 @@ function start() {
                 case 'View employees':
                     viewEmployees();
                     break;
-                case 'Update employee role':
-                    updateEmployeeRole();
+                case 'View employees by manager':
+                    viewEmpByManager();
+                    break;
+                case 'Update employee managers':
+                    updateEmpManagers();
+                    break;
+                case 'Delete departments':
+                    deleteDepartments();
+                    break;
+                case 'Delete roles':
+                    deleteRoles();
+                    break;
+                case 'Delete employees':
+                    deleteEmployees();
                     break;
                 default:
                     db.end();
                     break;
             }
-            if (err) throw (err);
         })
 };
 // =====================================
@@ -80,7 +109,7 @@ function addDepartment() {
         }).then(({ name }) => {
             const query = 'insert into department (name) values (?)';
             db.query(query, name, (err, res) => {
-                if (err) throw (err);
+                if (err) throw err;
                 start();
             })
         })
@@ -114,7 +143,7 @@ function addEmployee() {
             const query = 'insert into employee (first_name, last_name, role_id, manager_id) values (?,?,?,?)';
             const employee = [res.first_name, res.last_name, res.role_id, res.manager_id]
             db.query(query, employee, (err, res) => {
-                if (err) throw (err);
+                if (err) throw err;
                 start();
             });
         });
@@ -124,30 +153,30 @@ function addEmployee() {
 // Add role function ===================
 function addRole() {
     inquirer
-    .prompt([
-        {
-            name: 'title',
-            type: 'input',
-            message: 'Enter title of new role: '
-        },
-        {
-            name: 'salary',
-            type: 'integer',
-            message: 'Enter the salary of the new role: '
-        },
-        {
-            name: 'department_id',
-            type: 'input',
-            message: 'Enter the department ID for the new role: '
-        }
-    ]).then((res) => {
-        const query = 'insert into role (title, salary, department_id) values (?,?,?)';
-        const role = [res.title, res.salary, res.department_id];
-        db.query(query, role, (err, res) => {
-            if (err) throw (err);
-            start();
+        .prompt([
+            {
+                name: 'title',
+                type: 'input',
+                message: 'Enter title of new role: '
+            },
+            {
+                name: 'salary',
+                type: 'integer',
+                message: 'Enter the salary of the new role: '
+            },
+            {
+                name: 'department_id',
+                type: 'input',
+                message: 'Enter the department ID for the new role: '
+            }
+        ]).then((res) => {
+            const query = 'insert into role (title, salary, department_id) values (?,?,?)';
+            const role = [res.title, res.salary, res.department_id];
+            db.query(query, role, (err, res) => {
+                if (err) throw err;
+                start();
+            })
         })
-    })
 }
 // =====================================
 
@@ -155,8 +184,9 @@ function addRole() {
 function viewByDepartment() {
     const query = 'select * from department';
     db.query(query, (err, res) => {
-        if (err) throw (err);
-        console.table(res);
+        if (err) throw err;
+        console.log(table(toTableFormat(res)));
+        console.log(res);
         start();
     });
 };
@@ -166,8 +196,8 @@ function viewByDepartment() {
 function viewRoles() {
     const query = 'select * from role';
     db.query(query, (err, res) => {
-        if (err) throw (err);
-        console.table(res);
+        if (err) throw err;
+        console.log(table(toTableFormat(res)));
         start();
     });
 };
@@ -177,9 +207,59 @@ function viewRoles() {
 function viewEmployees() {
     const query = 'select * from employee';
     db.query(query, (err, res) => {
-        if (err) throw (err);
-        console.table(res);
+        if (err) throw err;
+        console.log(table(toTableFormat(res)));
         start();
     });
 };
 // =====================================
+
+
+// BONUS
+// View employees by manager function ==
+// function viewEmpByManager() {
+//     inquirer
+//     .prompt({
+//         name: 'manager',
+//         type: 'list',
+//         message: 'Please select the manager: ',
+//         choices: 
+//     })
+// }
+// =====================================
+
+// Update employee managers function ===
+// updateEmpManagers()
+// =====================================
+
+// Delete departments function =========
+// deleteDepartments()
+// =====================================
+
+// Delete roles function ===============
+// deleteRoles()
+// =====================================
+
+// Delete employees function ===========
+// deleteEmployees()
+function deleteEmployees() {
+    inquirer
+        .prompt({
+            name: 'id',
+            type: 'input',
+            message: 'Enter the ID of the employee you want to delete: '
+        }).then((id) => {
+            const query = 'delete from employee where id=?';
+            db.query(query, id, (err, res) => {
+                if (err) throw err;
+                start();
+            })
+        })
+}
+// =====================================
+
+function toTableFormat(arrayOfObjects) {
+    const header = Object.keys(arrayOfObjects[0]);
+    const rows = arrayOfObjects.map(obj => Object.values(obj));
+    return [header, ...rows];
+}
