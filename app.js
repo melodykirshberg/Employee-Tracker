@@ -237,6 +237,13 @@ function viewEmployees() {
 
 // Delete roles function ===============
 // deleteRoles()
+// function deleteRoles() {
+//     inquirer
+//     .prompt({
+//         name: 'id',
+//         type: 'list'
+//     })
+// }
 // =====================================
 
 // Delete employees function ===========

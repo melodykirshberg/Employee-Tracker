@@ -16,6 +16,7 @@ In your terminal type:
 * For further instructions, visit https://help.github.com.
 
 ## Demo
+![alt text](assets/emptrack.gif "Demo")
 
 ## Credits
 [UABootCamp](https://bootcamp.ce.arizona.edu/coding/)
