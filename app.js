@@ -48,11 +48,7 @@ function start() {
                     'View by department',
                     'View roles',
                     'View employees',
-                    'View employees by manager',
-                    'Update employee managers',
-                    'Delete departments',
-                    'Delete roles',
-                    'Delete employees',
+                    'Update employee roles',
                     'Exit'
                 ]
             }
@@ -76,20 +72,8 @@ function start() {
                 case 'View employees':
                     viewEmployees();
                     break;
-                case 'View employees by manager':
-                    viewEmpByManager();
-                    break;
-                case 'Update employee managers':
-                    updateEmpManagers();
-                    break;
-                case 'Delete departments':
-                    deleteDepartments();
-                    break;
-                case 'Delete roles':
-                    deleteRoles();
-                    break;
-                case 'Delete employees':
-                    deleteEmployees();
+                case 'Update employee roles':
+                    updateEmpRoles();
                     break;
                 default:
                     db.end();
@@ -118,65 +102,112 @@ function addDepartment() {
 
 // Add employee function ===============
 function addEmployee() {
-    inquirer
-        .prompt([{
-            name: 'first_name',
-            type: 'input',
-            message: 'Enter the new employees first name: '
-        },
-        {
-            name: 'last_name',
-            type: 'input',
-            message: 'Enter the new employees last name: '
-        },
-        {
-            name: 'role_id',
-            type: 'input',
-            message: 'Enter the new employees role: '
-        },
-        {
-            name: 'manager_id',
-            type: 'input',
-            message: 'Enter the new employees manager'
-        }
-        ]).then((res) => {
-            const query = 'insert into employee (first_name, last_name, role_id, manager_id) values (?,?,?,?)';
-            const employee = [res.first_name, res.last_name, res.role_id, res.manager_id]
-            db.query(query, employee, (err, res) => {
-                if (err) throw err;
-                start();
+    db.query(
+        'select * from employee', (err, empRes) => {
+            const employees = empRes.map(employee => {
+                return employee.first_name + ' ' + employee.last_name;
             });
-        });
-};
+            db.query(
+                'select * from role', (err, roleRes) => {
+                    const roles = roleRes.map(role => {
+                        return role.title;
+                    });
+
+                    inquirer
+                        .prompt([{
+                            name: 'first_name',
+                            type: 'input',
+                            message: 'Enter the new employees first name: '
+                        },
+                        {
+                            name: 'last_name',
+                            type: 'input',
+                            message: 'Enter the new employees last name: '
+                        },
+                        {
+                            name: 'role_id',
+                            type: 'list',
+                            message: 'Choose the new employees role: ',
+                            choices: roles
+                        },
+                        {
+                            name: 'manager_id',
+                            type: 'list',
+                            message: 'Choose the new employees manager',
+                            choices: employees
+                        }
+                        ]).then((res) => {
+                            const { first_name, last_name } = res;
+                            const manager = empRes.filter(employee => {
+                                return employee.first_name + ' ' + employee.last_name === res.manager;
+                            })[0];
+                            const role_id = roleRes.filter(role => {
+                                return role.title === res.role;
+                            })[0];
+                            const manager_id = manager ? manager.id : null;
+                            db.query(
+                                'insert into employee set ?',
+                                { first_name, last_name, role_id, manager_id }, (err, result) => {
+                                    if (err) throw err;
+                                }
+                            )
+                            start();
+                        });
+                }
+            )
+        }
+    )
+}
 // =====================================
 
 // Add role function ===================
 function addRole() {
-    inquirer
-        .prompt([
-            {
-                name: 'title',
-                type: 'input',
-                message: 'Enter title of new role: '
-            },
-            {
-                name: 'salary',
-                type: 'integer',
-                message: 'Enter the salary of the new role: '
-            },
-            {
-                name: 'department_id',
-                type: 'input',
-                message: 'Enter the department ID for the new role: '
-            }
-        ]).then((res) => {
-            const query = 'insert into role (title, salary, department_id) values (?,?,?)';
-            const role = [res.title, res.salary, res.department_id];
-            db.query(query, role, (err, res) => {
-                if (err) throw err;
-                start();
-            })
-        })
+    db.query(
+        'select * from department', (err, result) => {
+            if (err) throw err;
+            const departments = result.map(deparment => department.name);
+            inquirer
+                .prompt([
+                    {
+                        name: 'title',
+                        type: 'input',
+                        message: 'Enter title of new role: '
+                    },
+                    {
+                        name: 'salary',
+                        type: 'input',
+                        message: 'Enter the salary of the new role: ',
+                        validate: salary => {
+                            if (isNaN(salary) || salary < 0) {
+                                return 'Please enter a number'
+                            }
+                            return true;
+                        }
+                    },
+                    {
+                        name: 'department',
+                        type: 'list',
+                        message: 'What department is it in?',
+                        choices: departments
+                    }
+                ]).then((res) => {
+                    const { title } = res;
+                    const salary = res.salary;
+                    const department_id = res.department_id;
+                })[0];
+
+            db.query(
+                'insert into role set ?',
+                {
+                    title, salary, department_id
+                },
+                (err, result) => {
+                    if (err) throw err;
+                    start();
+                }
+            )
+        }
+    )
 }
 // =====================================
 
@@ -213,55 +244,46 @@ function viewEmployees() {
 };
 // =====================================
 
-
-// BONUS
-// View employees by manager function ==
-// function viewEmpByManager() {
-//     inquirer
-//     .prompt({
-//         name: 'manager',
-//         type: 'list',
-//         message: 'Please select the manager: ',
-//         choices: 
-//     })
-// }
-// =====================================
-
-// Update employee managers function ===
-// updateEmpManagers()
-// =====================================
-
-// Delete departments function =========
-// deleteDepartments()
-// =====================================
-
-// Delete roles function ===============
-// deleteRoles()
-// function deleteRoles() {
-//     inquirer
-//     .prompt({
-//         name: 'id',
-//         type: 'list'
-//     })
-// }
-// =====================================
-
-// Delete employees function ===========
-// deleteEmployees()
-function deleteEmployees() {
-    inquirer
-        .prompt({
-            name: 'id',
-            type: 'input',
-            message: 'Enter the ID of the employee you want to delete: '
-        }).then((id) => {
-            const query = 'delete from employee where id=?';
-            db.query(query, id, (err, res) => {
-                if (err) throw err;
-                start();
-            })
+// Update employee roles ===============
+function updateEmpRoles() {
+    const query = 'select * from employee';
+    db.query(query, (err, res) => {
+        const employees = res.map(employee => {
+            return employee.first_name + ' ' + employee.last_name;
+        });
+        db.query('select * from role', (err, result) => {
+            const roles = result.map(role => {
+                return role.title;
+            });
+            inquirer
+                .prompt([
+                    {
+                        type: 'list',
+                        name: 'employee',
+                        message: 'Which employee\'s role do you want to update?',
+                        choices: employees
+                    },
+                    {
+                        type: 'list',
+                        name: 'role',
+                        message: 'What\'s the employee\'s new role?',
+                        choices: roles
+                    }
+                ]).then(answer => {
+                    const id = result.filter(employee => {
+                        return employee.first_name + ' ' + employee.last_name === answer.employee;
+                    })[0]
+                    db.query(
+                        'update employee set role_id = ? where id = ?', [role_id, id], (err, result) => {
+                            if (err) throw err;
+                            start();
+                        }
+                    )
+                })
         })
+    })
 }
+
 // =====================================
 
 function toTableFormat(arr) {

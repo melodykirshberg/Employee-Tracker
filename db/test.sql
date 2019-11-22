@@ -6,7 +6,7 @@ values
 ('Engineering'), 
 ('Legal'), 
 ('Finance');
-
+​
 insert into role (title, salary, department_id)
 values 
 ('Sales Lead', 10000, 1),
@@ -16,7 +16,7 @@ values
 ('Legal Team Lead', 250000, 3),
 ('Lawyer', 190000, 3),
 ('Accountant', 125000, 4);
-
+​
 insert into employee (first_name, last_name, role_id, manager_id)
 values 
 ('Kaidan', 'Alenko', 1, null),
